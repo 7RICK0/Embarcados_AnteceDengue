@@ -16,8 +16,8 @@ ESP32 (sensores + atuadores) --MQTT--> Mosquitto --> Backend FastAPI (SQLite) --
 | `applications/frontend/` | Dashboard (HTML/JS, tempo real via WebSocket) |
 | `applications/tools/` | `simulate_station.py` – estação virtual p/ desenvolver sem hardware |
 | `applications/mosquitto/` | Config do broker |
-| `schematics/` | Tabela de ligações / esquemas |
-| `docs/` | Protocolo MQTT, plano de testes, relatório |
+| `schematics/` | Tabela de ligações, diagrama do Wokwi e imagem do circuito |
+| `docs/` | Protocolo MQTT, plano de testes, evidências (`docs/evidencias/`), relatório |
 
 ## Rodando (sem hardware)
 ```bash
@@ -42,7 +42,8 @@ cd applications/backend && pip install pytest httpx && pytest -q
 ## Firmware
 1. `cp esp32-esp8266/include/secrets.example.h esp32-esp8266/include/secrets.h` e preencha (**não commitar**).
 2. Ajuste `MQTT_HOST` / `STATION_ID` em `include/config.h`.
-3. Simulação: `pio run -e wokwi` e abra a pasta no Wokwi (VS Code ou wokwi.com). Hardware: `pio run -e wisdom -t upload`.
+3. Simulação: `pio run -e wokwi`, abra `esp32-esp8266/` no VS Code com a extensão **Wokwi Simulator** e clique em ▶ no `diagram.json` (o `wokwi.toml` carrega o firmware compilado pelo PlatformIO; o editor do site wokwi.com não serve para este projeto). Hardware: `pio run -e wisdom -t upload`.
+4. Para ver a simulação no dashboard: rode o backend com `MQTT_HOST=broker.hivemq.com` (o firmware do Wokwi publica nesse broker público como `rec01`).
 
 ## Status
 Ver `docs/TESTES.md` para o que foi validado e o que ainda precisa de teste em hardware.

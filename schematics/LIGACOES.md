@@ -29,4 +29,4 @@ LED RGB do kit na protoboard, um resistor por canal: R = GPIO25, G = GPIO26, B =
 | Temp/UR | 32 | DHT22 |
 
 Regras: entradas analógicas só em ADC1 (GPIO32–39) por causa do Wi-Fi; pinos de boot (0, 2, 4, 5, 12, 15) pedem cuidado; HC-SR04 exige divisor 5 V→3,3 V no echo.
-Arquivo do Wokwi: `esp32-esp8266/diagram.json`.
+Arquivo do Wokwi: `esp32-esp8266/diagram.json` (cópia em `schematics/wokwi-diagram.json`; imagem do circuito em `schematics/wokwi-circuito.png`).
