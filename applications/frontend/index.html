@@ -49,14 +49,15 @@
 </main>
 <script>
 const $=id=>document.getElementById(id);let cur=null,hist=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function j(u,o){const r=await fetch(u,o);if(!r.ok)throw new Error(await r.text());return r.json()}
 async function loadStations(){
   const s=await j('/api/stations');const sel=$('sel');
-  const keep=sel.value;sel.innerHTML=s.map(x=>`<option>${x.station_id}</option>`).join('');
+  const keep=sel.value;sel.innerHTML=s.map(x=>`<option>${esc(x.station_id)}</option>`).join('');
   if(keep&&s.some(x=>x.station_id==keep))sel.value=keep;
   cur=sel.value||null;if(cur){const x=s.find(y=>y.station_id==cur);setStatus(x.status);await loadHist()}
 }
-$('sel').onchange=()=>{cur=$('sel').value;loadHist()};
+$('sel').onchange=()=>{cur=$('sel').value;$('cmsg').textContent='';loadHist()};
 function setStatus(s){$('st').textContent=s;$('st').className='badge '+s}
 async function loadHist(){if(!cur)return;hist=await j('/api/telemetry?station='+cur+'&limit=120');render()}
 function show(d){
@@ -64,7 +65,7 @@ function show(d){
   $('h').textContent=d.relative_humidity!=null?d.relative_humidity.toFixed(0)+' %':'–';
   $('r').textContent=(d.rainfall_mm??0).toFixed(1)+' mm';
   $('b').textContent=d.battery_voltage!=null?d.battery_voltage.toFixed(2)+' V':'–';
-  const a=d.alert;$('al').innerHTML=(a&&(Array.isArray(a)?a.length:a))?`<div class="alert">⚠ Alerta: ${Array.isArray(a)?a.join(', '):'limiar'}</div>`:'';
+  const a=d.alert;$('al').innerHTML=(a&&(Array.isArray(a)?a.length:a))?`<div class="alert">⚠ Alerta: ${esc(Array.isArray(a)?a.join(', '):'limiar')}</div>`:'';
   $('up').textContent='última leitura: '+new Date((d.timestamp||d.ts)*1000).toLocaleTimeString();
 }
 function line(cv,series,colors){
@@ -85,7 +86,7 @@ async function cmd(b){
   $('cmsg').textContent='enviado: '+JSON.stringify(b)+' (aguardando ack…)'}catch(e){$('cmsg').textContent='erro: '+e.message}
 }
 async function loadEvents(){const e=await j('/api/events?limit=30');
-  $('ev').innerHTML=e.map(x=>`<li>${new Date(x.ts*1000).toLocaleTimeString()} · <b>${x.station_id}</b> · ${x.kind} ${x.detail||''}</li>`).join('')}
+  $('ev').innerHTML=e.map(x=>`<li>${new Date(x.ts*1000).toLocaleTimeString()} · <b>${esc(x.station_id)}</b> · ${esc(x.kind)} ${esc(x.detail)}</li>`).join('')}
 function connect(){
   const ws=new WebSocket((location.protocol=='https:'?'wss://':'ws://')+location.host+'/ws');
   ws.onopen=()=>{$('ws').textContent='ao vivo';$('ws').className='badge online'};
