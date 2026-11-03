@@ -1,0 +1,16 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports: ["1883:1883"]
+    volumes:
+      - ./applications/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosq_data:/mosquitto/data
+    restart: unless-stopped
+  backend:
+    build: { context: ., dockerfile: applications/backend/Dockerfile }
+    environment: { MQTT_HOST: mosquitto }
+    ports: ["8000:8000"]
+    volumes: [api_data:/data]
+    depends_on: [mosquitto]
+    restart: unless-stopped
+volumes: { mosq_data: {}, api_data: {} }

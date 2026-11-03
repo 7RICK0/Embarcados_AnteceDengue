@@ -1,0 +1,6 @@
+secrets.h
+.pio/
+.vscode/
+__pycache__/
+*.db
+.env

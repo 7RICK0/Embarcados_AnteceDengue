@@ -1,0 +1,25 @@
+# Uso:  docker compose -f docker-compose.yml -f docker-compose.ipv6.yml up --build
+# Habilita IPv6 na rede interna e publica as portas também em [::].
+# NÃO TESTADO neste repositório: o Docker precisa ter IPv6 ligado (Docker Desktop: Settings > Docker Engine
+# > "ipv6": true; em Linux: "ipv6": true e "ip6tables": true no daemon.json). Se falhar, rode o Mosquitto
+# direto no PC/WSL/Raspberry Pi (escuta IPv6 por padrão) e use o backend com --host ::.
+services:
+  mosquitto:
+    ports:
+      - "1883:1883"
+      - "[::]:1883:1883"
+    networks: [net6]
+  backend:
+    environment:
+      HOST: "::"
+    ports:
+      - "8000:8000"
+      - "[::]:8000:8000"
+    networks: [net6]
+networks:
+  net6:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+        - subnet: fd00:ae7e::/64
