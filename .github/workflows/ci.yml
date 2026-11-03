@@ -17,4 +17,4 @@ jobs:
         with: { python-version: "3.12" }
       - run: pip install platformio
       - run: cp esp32-esp8266/include/secrets.example.h esp32-esp8266/include/secrets.h
-      - run: pio run -d esp32-esp8266 -e wokwi
+      - run: pio run -d esp32-esp8266 -e wokwi -e wisdom
