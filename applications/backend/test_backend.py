@@ -39,6 +39,31 @@ def test_alert_rain_and_heat():
     assert set(r["alert"]) == {"chuva", "calor"}
 
 
+def test_rain_alert_follows_board_ack():
+    assert pub("rec01", "telemetry", {"rainfall_mm": 6})["alert"] == []
+    pub("rec01", "ack", {"interval_s": 10, "rain_alert_mm": 5, "led": False})   # formato do firmware
+    assert pub("rec01", "telemetry", {"rainfall_mm": 6})["alert"] == ["chuva"]
+    assert pub("rec02", "telemetry", {"rainfall_mm": 6})["alert"] == []          # outra estação: padrão
+    pub("rec02", "ack", {"applied": {}, "cfg": {"rain_alert_mm": 2.0}})          # formato do simulador
+    assert pub("rec02", "telemetry", {"rainfall_mm": 3})["alert"] == ["chuva"]
+
+
+def test_rain_alert_survives_restart(tmp_path):
+    db = str(tmp_path / "t.db")
+    main.init_db(db)
+    pub("rec01", "ack", {"rain_alert_mm": 5})
+    main._db.close()
+    main.init_db(db)   # backend reiniciado
+    assert pub("rec01", "telemetry", {"rainfall_mm": 6})["alert"] == ["chuva"]
+    main._db.close()
+
+
+def test_bad_ack_ignored():
+    pub("rec01", "ack", "nao json")
+    pub("rec01", "ack", {"rain_alert_mm": True})
+    assert "rec01" not in main._rain_alert
+
+
 def test_bad_payload_ignored_and_logged():
     assert pub("rec01", "telemetry", "{nao json") is None
     assert pub("rec01", "telemetry", "[1,2]") is None

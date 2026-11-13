@@ -36,6 +36,7 @@ _clients: set = set()
 _loop = None
 _mqtt = None
 _status: dict = {}  # station_id -> "online"/"offline"
+_rain_alert: dict = {}  # station_id -> limiar de chuva efetivo informado pela placa no ack
 
 
 def init_db(path=None):
@@ -55,11 +56,28 @@ def init_db(path=None):
         """
     )
     _db.commit()
+    _rain_alert.clear()
+    for r in _db.execute("SELECT station_id, detail FROM events WHERE kind='ack' ORDER BY id"):
+        learn_rain_alert(r["station_id"], r["detail"])
 
 
-def compute_alert(d: dict) -> list:
+def learn_rain_alert(station: str, text: str):
+    """Guarda o limiar de chuva do ack (firmware: no topo; simulador: em "cfg")."""
+    try:
+        d = json.loads(text)
+    except ValueError:
+        return
+    if not isinstance(d, dict):
+        return
+    cfg = d.get("cfg") if isinstance(d.get("cfg"), dict) else d
+    v = cfg.get("rain_alert_mm")
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        _rain_alert[station] = float(v)
+
+
+def compute_alert(d: dict, station: str | None = None) -> list:
     reasons = []
-    if (d.get("rainfall_mm") or 0) >= RAIN_ALERT_MM:
+    if (d.get("rainfall_mm") or 0) >= _rain_alert.get(station, RAIN_ALERT_MM):
         reasons.append("chuva")
     if (d.get("temperature_c") or 0) >= TEMP_ALERT_C:
         reasons.append("calor")
@@ -88,6 +106,7 @@ def handle_message(topic: str, payload: bytes):
             return {"type": "status", "station_id": station, "status": st}
         return None
     if kind == "ack":
+        learn_rain_alert(station, text)
         log_event(station, "ack", text)
         return {"type": "ack", "station_id": station, "data": text}
     if kind != "telemetry":
@@ -99,7 +118,7 @@ def handle_message(topic: str, payload: bytes):
     except ValueError:
         log_event(station, "bad_payload", text[:200])
         return None
-    reasons = compute_alert(d)
+    reasons = compute_alert(d, station)
     now = int(time.time())
     row = (station, int(d.get("timestamp") or now), now,
            d.get("temperature_c"), d.get("relative_humidity"), d.get("rainfall_mm"),

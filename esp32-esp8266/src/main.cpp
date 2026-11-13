@@ -63,6 +63,10 @@ static bool readTH(float &t, float &h) {
   t = dht.readTemperature(); h = dht.readHumidity();
 #elif defined(USE_HTU21D)
   t = htu.readTemperature(); h = htu.readHumidity();
+#elif defined(USE_POT_SIM)
+  int raw = analogRead(PIN_POT);   // deslizante da Wisdom simula T/UR enquanto não há sensor
+  t = 20.0f + raw * 20.0f / 4095;  // 20–40 °C
+  h = 40.0f + raw * 55.0f / 4095;  // 40–95 %
 #else
   t = 25.0f; h = 60.0f;
 #endif
@@ -89,8 +93,12 @@ void taskSensor(void *) {
     } else {
       Serial.println("[sensor] leitura invalida");
     }
+    // dorme em fatias de 1 s: interval_s pode passar do watchdog (WDT_TIMEOUT_S)
+    for (uint32_t s = 0; s < iv; s++) {
+      esp_task_wdt_reset();
+      vTaskDelay(pdMS_TO_TICKS(1000));
+    }
     esp_task_wdt_reset();
-    vTaskDelay(pdMS_TO_TICKS(iv * 1000));
   }
 }
 
@@ -122,6 +130,7 @@ static bool connectMqtt() {
   if (ok) {
     mqtt.publish(tStatus.c_str(), "online", true);
     mqtt.subscribe(tCmd.c_str(), 1);
+    publishAck();   // backend aprende o limiar efetivo da placa (que volta ao padrão após reboot)
   }
   return ok;
 }

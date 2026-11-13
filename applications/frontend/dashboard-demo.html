@@ -1,5 +1,9 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AnteceDengue Dashboard</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <style>
   /* Layout: painel de operação. Faixa de semáforos das 4 estações no topo, detalhe e comandos embaixo. */
   :root{--bg:#f3f6f6;--card:#ffffff;--line:#dde5e6;--tx:#10201f;--mut:#58706f;--acc:#0f766e;--accL:#dff1ee;
@@ -52,6 +56,8 @@
   li time{color:var(--mut);flex:none}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+</head>
+<body>
 <div class="wrap">
   <header>
     <div><h1>AnteceDengue · Estações</h1><div class="sub">Condições favoráveis ao Aedes aegypti, Recife</div></div>
@@ -149,3 +155,5 @@ setInterval(()=>{for(const id in NAMES){const s=S[id],d=reading(id,s.hist.at(-1)
 addEventListener("resize",drawDetail);
 syncCtl();drawAll();drawEv();
 </script>
+</body>
+</html>

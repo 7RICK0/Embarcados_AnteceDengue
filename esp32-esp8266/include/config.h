@@ -27,6 +27,7 @@
 #define PIN_LED_LINK  18
 #define PIN_RAIN      27     // pluviômetro (reed) ou botão da placa simulando báscula
 #define PIN_DHT       32     // só Wokwi (ADC1/GPIO32 ok com Wi-Fi)
+#define PIN_POT       39     // deslizante da Wisdom (env wisdom_pot)
 #define PIN_SDA       21     // I2C padrão da ESP32; o material só confirma o APDS-9960 (luz). T/UR da Wisdom: NÃO confirmado.
 #define PIN_SCL       22
 

@@ -37,6 +37,7 @@ def main():
     def on_connect(cl, ud, fl, rc, pr=None):
         cl.publish(f"{base}/status", "online", qos=1, retain=True)
         cl.subscribe(f"{base}/cmd", 1)
+        cl.publish(f"{base}/ack", json.dumps({"applied": {}, "cfg": cfg}), qos=1)
 
     def on_message(cl, ud, msg):
         try:
