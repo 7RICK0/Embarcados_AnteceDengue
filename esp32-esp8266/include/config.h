@@ -24,7 +24,9 @@
 
 // ---- Pinos (mesmo mapeamento no Wokwi e na Wisdom: LED alerta GPIO4, LED/azul GPIO18, botão GPIO27) ----
 #define PIN_LED_ALERT 4
-#define PIN_LED_LINK  18
+#ifndef PIN_LED_LINK
+  #define PIN_LED_LINK 18    // no ESP32 DevKit o env devkit troca para GPIO2 (LED azul da placa)
+#endif
 #define PIN_RAIN      27     // pluviômetro (reed) ou botão da placa simulando báscula
 #define PIN_DHT       32     // só Wokwi (ADC1/GPIO32 ok com Wi-Fi)
 #define PIN_POT       39     // deslizante da Wisdom (env wisdom_pot)

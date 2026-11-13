@@ -1,10 +1,11 @@
 # Testes e validação
 
-Última atualização: 03/11/2026. Só está marcado como validado o que foi **executado de verdade**. Evidências em `docs/evidencias/`.
+Última atualização: 13/11/2026. Só está marcado como validado o que foi **executado de verdade**. Evidências em `docs/evidencias/`.
 
-## Validado (sem hardware)
-- [x] **Firmware compila** nos dois ambientes (`pio run -e wokwi` e `pio run -e wisdom`) com `espressif32@7.0.1` fixado no `platformio.ini`. A 8.0.0 (out/2026) quebrou o build no CI, por isso a versão fixa.
-- [x] **Backend**: 7 testes unitários (`pytest`) passando, local e no CI.
+## Validado
+- [x] **Firmware compila** em todos os ambientes (`wokwi`, `wisdom`, `wisdom_pot` e `devkit`), verificado a cada push pelo GitHub Actions, com `espressif32@7.0.1` fixado no `platformio.ini`. A 8.0.0 (out/2026) quebrou o build no CI, por isso a versão fixa.
+- [x] **Placa física (ESP32 DevKit)**: firmware gravado pela USB (CP210x), inicializa e roda as tarefas do FreeRTOS; LED azul da placa (GPIO2) funcionando como LED de link. Evidência: Figura 2 do relatório do Check Point (`docs/Relatorio_CheckPoint_G15.pdf`).
+- [x] **Backend**: 10 testes unitários (`pytest`) passando, local e no CI (inclui a sincronização do limiar de chuva vindo do `ack`).
 - [x] **Wokwi (VS Code)**: firmware sobe, conecta no Wi-Fi `Wokwi-GUEST` e no broker público `broker.hivemq.com` (`[mqtt] conectado`). Evidência: `wokwi-vscode-mqtt-conectado.png`.
 - [x] **Ponta a ponta com o Wokwi**: estação `rec01` (Wokwi) → HiveMQ → backend → dashboard, com os valores do DHT22 simulado (24 °C / 40 %).
 - [x] **Comando de descida no Wokwi**: botão "LED ligar" no dashboard → `cmd` → firmware respondeu `ack` `{"led":true}` em ~1 s. Evidência: `dashboard-wokwi-rec01-ack.jpg`.
@@ -21,7 +22,8 @@
 - [ ] Interação manual no Wokwi: apertar o botão de chuva (GPIO27) até passar do limiar e ver o LED vermelho; LED azul fixo com MQTT ok.
 - [ ] `docker-compose.yml` e `docker-compose.ipv6.yml` (Docker Desktop não subiu na máquina de teste).
 - [ ] Mosquitto real (o teste IPv6 usou o broker Python `amqtt` como substituto).
-- [ ] **Placa real (Wisdom)**: Wi-Fi, IPv6 (`WiFi.enableIpV6()`), pinos I2C/sensor T/UR, LEDs.
+- [ ] **Montagem na protoboard do DevKit** (DHT22, botão e LED de alerta; ver `schematics/LIGACOES.md`).
+- [ ] **Placa física na rede**: Wi-Fi, MQTT com o broker local e IPv6 (`WiFi.enableIpV6()`).
 - [ ] Semáforo RGB por nível de risco (pinos R/G da placa ainda sem confirmação).
 
 ## Medições para o relatório
