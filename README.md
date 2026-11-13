@@ -39,7 +39,7 @@ python applications/tools/simulate_station.py --station rec02 --interval 3
 ```
 Com Docker (ainda não validado, ver `docs/TESTES.md`): `docker compose up --build` sobe o broker na porta 1883 e o dashboard em http://localhost:8000.
 
-## IPv6 (obrigatório)
+## IPv6 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.ipv6.yml up --build   # Docker com IPv6 ligado
 python applications/tools/simulate_station.py --host ::1 --station rec02      # simulador por IPv6
